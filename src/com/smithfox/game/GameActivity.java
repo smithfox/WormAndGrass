@@ -85,6 +85,10 @@ public class GameActivity extends Activity {
 					synchronized (holder) {
 						//Log.d(TAG, "draw");
 						c = holder.lockCanvas();
+						if(c==null) {
+							Thread.sleep(10);
+							continue;
+						}
 						c.drawColor(Color.BLACK);
 						Paint p = new Paint();
 						p.setColor(Color.WHITE);
