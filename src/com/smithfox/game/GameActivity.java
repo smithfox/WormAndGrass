@@ -7,12 +7,14 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class GameActivity extends Activity {
 	private final static String TAG="GA";
+	private final static Handler handler = new Handler();
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -20,6 +22,19 @@ public class GameActivity extends Activity {
 		setContentView(new Game1View(this));
 	}
 
+	@Override
+	protected void onDestroy() {
+		Log.d(TAG, "onDestroy");
+		super.onDestroy();
+
+		handler.postDelayed(new Runnable() {
+            public void run() {
+            	Log.d(TAG, "!!! GameActivity say goodbye to you");
+                System.exit(0);
+            }
+        }, 500);
+	}
+	
 	class Game1View extends SurfaceView implements SurfaceHolder.Callback {
 		private SurfaceHolder holder;
 		private MyThread myThread;
@@ -32,10 +47,8 @@ public class GameActivity extends Activity {
 		}
 
 		@Override
-		public void surfaceChanged(SurfaceHolder holder, int format, int width,
-				int height) {
-
-
+		public void surfaceChanged(SurfaceHolder holder, int format, int width,	int height) {
+			Log.d(TAG, "surfaceChanged");
 		}
 
 		@Override
