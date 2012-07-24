@@ -1,27 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:baselineAligned="false" >
+    android:orientation="vertical" >
 
-    <com.smithfox.game.GameView
+    <SurfaceView
         android:id="@+id/gameview"
-        android:layout_width="100dp"
-        android:layout_height="100dp" 
-        android:layout_alignParentTop="true"/>
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+    </SurfaceView>
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Button_1" />
+    <LinearLayout android:id="@+id/linearLayout1" android:layout_height="wrap_content" android:layout_width="fill_parent">
+        <Button android:text="@string/button1" android:id="@+id/button1" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+        <Button android:text="@string/button2" android:id="@+id/button2" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+        <Button android:text="@string/button3" android:id="@+id/button3" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toRightOf="@id/button1"
-        android:text="Button_2" />
-</RelativeLayout>
+</LinearLayout>
