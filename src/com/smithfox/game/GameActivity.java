@@ -41,9 +41,11 @@ public class GameActivity extends Activity {
 
 		public Game1View(Context context) {
 			super(context);
+			this.setKeepScreenOn(true);
+			this.setLongClickable(true);
+			Log.d(TAG, "Game1View");
 			holder = this.getHolder();
 			holder.addCallback(this);
-			myThread = new MyThread(holder);
 		}
 
 		@Override
@@ -54,6 +56,7 @@ public class GameActivity extends Activity {
 		@Override
 		public void surfaceCreated(SurfaceHolder holder) {
 			Log.d(TAG, "surfaceCreated");
+			myThread = new MyThread(holder);
 			myThread.isRun = true;
 			myThread.start();
 		}
@@ -63,7 +66,6 @@ public class GameActivity extends Activity {
 			Log.d(TAG, "surfaceDestroyed");
 			myThread.isRun = false;
 		}
-
 	}
 
 	class MyThread extends Thread {
@@ -75,38 +77,42 @@ public class GameActivity extends Activity {
 			isRun = true;
 		}
 
+		private void draw(int count) {
+			Canvas c = null;
+			try {
+				Log.d(TAG, "draw");
+				c = holder.lockCanvas();
+				if(c!=null) {
+					c.drawColor(Color.BLACK);
+					Paint p = new Paint();
+					p.setColor(Color.WHITE);
+					Rect r = new Rect(100, 50, 300, 250);
+					c.drawRect(r, p);
+					c.drawText("现在:" + count + "秒", 100, 310, p);
+				} else {
+					Log.d(TAG, "lockCanvas return null");
+				}
+			} catch (Exception e) {
+				Log.e(TAG, "", e);
+			} finally {
+				if (c != null) {
+					holder.unlockCanvasAndPost(c);
+				}
+			}
+		}
 		@Override
 		public void run() {
 			int count = 0;
 			Log.d(TAG, "Thread start");
 			while (isRun) {
-				Canvas c = null;
-				try {
-					synchronized (holder) {
-						//Log.d(TAG, "draw");
-						c = holder.lockCanvas();
-						if(c==null) {
-							Thread.sleep(10);
-							continue;
-						}
-						c.drawColor(Color.BLACK);
-						Paint p = new Paint();
-						p.setColor(Color.WHITE);
-						Rect r = new Rect(100, 50, 300, 250);
-						c.drawRect(r, p);
-						c.drawText("现在:" + (count++) + "秒", 100, 310, p);
-						Thread.sleep(1000);
-					}
-				} catch (Exception e) {
-					// TODO: handle exception
-					e.printStackTrace();
-				} finally {
-					if (c != null) {
-						holder.unlockCanvasAndPost(c);
-
-					}
-				}
+				draw(count);
+				count++;
+	            try {
+	                Thread.sleep(1000);
+	            } catch (Exception ex) {
+	            }
 			}
+
 			Log.d(TAG, "Thread end");
 		}
 	}
