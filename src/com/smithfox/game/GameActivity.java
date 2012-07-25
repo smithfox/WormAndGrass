@@ -1,8 +1,10 @@
 package com.smithfox.game;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,8 +19,14 @@ public class GameActivity extends Activity {
 	private final static Handler handler = new Handler();
 	
 	private SurfaceView gameview;
+	private GameSurface gamesurface;
+	
+	private PowerManager.WakeLock wakeLock = null;
+	
+	//在onCreata中，初始化游戏状态或恢复游戏状态
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Log.d(TAG, "onCreate");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main2);
 
@@ -29,8 +37,15 @@ public class GameActivity extends Activity {
 
         //gameview.getHolder().setFixedSize(300, 300);//设置分辨率
         gameview.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);//设置surfaceview不维护自己的缓冲区，而是等待屏幕的渲染引擎将内容推送到用户面前
-        gameview.getHolder().addCallback(new GameSurface(gameview.getHolder()));//对surface对象的状态进行监听
         
+        gamesurface = new GameSurface(gameview.getHolder());
+        gameview.getHolder().addCallback(gamesurface);//对surface对象的状态进行监听
+        
+        gamesurface.load(savedInstanceState);
+
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		wakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, getText(R.string.app_name).toString());
+		
 //        ButtonOnClikListiner buttonOnClikListinero=new ButtonOnClikListiner();
 //        Button btn1=(Button) this.findViewById(R.id.button1);
 //        Button btn2=(Button) this.findViewById(R.id.button2);
@@ -40,6 +55,73 @@ public class GameActivity extends Activity {
 //        btn3.setOnClickListener(buttonOnClikListinero);
 	}
 	
+	//在onRestart中恢复游戏状态
+	@Override
+	protected void onRestart() {
+		Log.d(TAG, "onRestart");
+		super.onRestart();
+		gamesurface.load(null);
+	}
+	
+	//在onResume中开始游戏循环
+	//本应在onStart中，但是我们看到，各种情况下，onResume都会在onStart之后调用
+	//所以简单的用onResume代替了onStart
+	@Override
+	protected void onResume() {
+		Log.d(TAG, "onResume");
+		super.onResume();
+		if( wakeLock != null && !wakeLock.isHeld()) {
+			wakeLock.acquire();
+		}
+
+		gamesurface.resume();
+	}
+	
+	//在onSaveInstanceState中保存游戏状态
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		Log.d(TAG, "onSaveInstanceState");
+		super.onSaveInstanceState(outState);
+		gamesurface.save(outState);
+	}
+	
+	//在onPause中结束游戏循环
+	@Override
+	protected void onPause() {
+		Log.d(TAG, "onPause");
+		super.onPause();
+		gamesurface.pause();
+		if( wakeLock != null  && wakeLock.isHeld()) {
+			wakeLock.release();
+		}
+	}
+/*
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		Log.d(TAG, "onWindowFocusChanged");
+		super.onWindowFocusChanged(hasFocus);
+		if(hasWindowFocus()) {
+			gamesurface.resume();
+		} else {
+			gamesurface.pause();
+		}
+	}
+*/
+	//在onDestory中销毁游戏数据
+	@Override
+	protected void onDestroy() {
+		Log.d(TAG, "onDestroy");
+		super.onDestroy();
+		gamesurface.pause();
+		gamesurface = null;
+		handler.postDelayed(new Runnable() {
+            public void run() {
+            	Log.d(TAG, "!!! GameActivity say goodbye to you");
+                System.exit(0);
+            }
+        }, 500);
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(0, Menu.FIRST, 0, "Button1");//.setIcon(R.drawable.icon);  //设置文字与图标
@@ -103,17 +185,6 @@ public class GameActivity extends Activity {
         }
 	}
 */
-	@Override
-	protected void onDestroy() {
-		Log.d(TAG, "onDestroy");
-		super.onDestroy();
 
-		handler.postDelayed(new Runnable() {
-            public void run() {
-            	Log.d(TAG, "!!! GameActivity say goodbye to you");
-                System.exit(0);
-            }
-        }, 500);
-	}
 
 }

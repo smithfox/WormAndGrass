@@ -3,60 +3,90 @@ package com.smithfox.game;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
+import android.graphics.Paint.Align;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
 public class GameSurface implements SurfaceHolder.Callback, Runnable {
 	private final static String TAG="GS";
-	private Thread myThread;
-	
-	private SurfaceHolder holder;
-	private int ScreenW=0;
-	private int ScreenH=0;
-	public boolean isRun;
 
+	private SurfaceHolder holder;
+	private int width, height;
+	private Paint paint = null;
+	private boolean running=false;
+
+	private long start, now, next, last, millis;
+	final static int MILLIS_PER_TICK = 20;
+	
 	public GameSurface(SurfaceHolder holder) {
 		this.holder = holder;
-//		ScreenW = w;
-//        ScreenH = h;
-	}
-	
-	@Override
-	public void surfaceCreated(SurfaceHolder holder) {
-		Log.d(TAG, "surfaceCreated");
-		this.isRun = true;
-		myThread = new Thread(this);
-		myThread.start();
+		
+		paint = new Paint();
+		paint.setTextSize(100.0f);
+		paint.setColor(Color.WHITE);
+		paint.setTextAlign(Align.CENTER);
 	}
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,	int height) {
 		Log.d(TAG, "surfaceChanged, w="+width+",h="+height);
-		this.ScreenH = height;
-		this.ScreenW = width;
+		this.height = height;
+		this.width = width;
+//		if(stopped) {
+//			new Thread(this).start();
+//		}
+	}
+
+	@Override
+	public void surfaceCreated(SurfaceHolder holder) {
+		Log.d(TAG, "surfaceCreated");
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		Log.d(TAG, "surfaceDestroyed");
-		this.isRun = false;
+		this.running = false;
 	}
 	
-	private void draw(int count) {
+	public void load(Bundle savedInstanceState) {
+		Log.d(TAG, "load, savedInstanceState="+savedInstanceState);
+		if(savedInstanceState != null) {
+			last = millis = savedInstanceState.getLong("last");
+		}
+	}
+	
+	public void resume() {
+		Log.d(TAG, "resume");
+		if(holder.getSurface() != null && !running) {
+			running = true;
+			new Thread(this).start();
+		}
+	}
+	
+	public void save(Bundle outState) {
+		Log.d(TAG, "save");
+		outState.putLong("last", millis);
+	}
+	
+	public void pause() {
+		Log.d(TAG, "pause");
+		running = false;
+		last = millis;
+	}
+	
+	private void draw(long count) {
 		Canvas c = null;
 		try {
-			Log.d(TAG, "draw");
+			//Log.d(TAG, "draw");
 			c = holder.lockCanvas();
 			if(c!=null) {
-				//c.drawColor(Color.BLACK);
-				Paint p = new Paint();
-				p.setColor(Color.WHITE);
-				Rect r = new Rect(0, 0, ScreenW, ScreenH);
-				//Rect r = new Rect(50, 50, 100, 100);
-				c.drawRect(r, p);
-				p.setColor(Color.BLUE);
-				c.drawText("现在:" + count + "秒", 100, 310, p);
+//				this.paint.setColor(Color.WHITE);
+//				Rect r = new Rect(0, 0, this.width, this.height);
+//				c.drawRect(r, this.paint);
+
+				c.drawARGB(255, 0, 0, 0);
+				c.drawText("" + count/1000, this.width/2, this.height/2, this.paint);
 			} else {
 				Log.d(TAG, "lockCanvas return null");
 			}
@@ -71,18 +101,33 @@ public class GameSurface implements SurfaceHolder.Callback, Runnable {
 
 	@Override
 	public void run() {
-		int count = 0;
+		start = System.currentTimeMillis();
 		Log.d(TAG, "Thread start");
-		while (isRun) {
-			draw(count);
-			count++;
-            try {
-                Thread.sleep(1000);
-            } catch (Exception ex) {
-            }
+		try {
+			while (running) {
+//				try{
+					_runOne();
+//				} catch(Exception e) {
+//					e.printStackTrace();
+//				}
+			}
+		} finally {
+			running = false;
 		}
-
 		Log.d(TAG, "Thread end");
 	}
 	
+	private void _runOne() {
+		now = System.currentTimeMillis();
+		if (now > next) {
+			millis = last + now - start;
+			draw(millis);
+			next = now + MILLIS_PER_TICK;
+		} else {
+            try {
+                Thread.sleep(next - now);
+            } catch (Exception ex) {
+            }
+		}
+	}
 }
