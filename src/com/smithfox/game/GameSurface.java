@@ -52,7 +52,7 @@ public class GameSurface implements SurfaceHolder.Callback, Runnable {
 				//c.drawColor(Color.BLACK);
 				Paint p = new Paint();
 				p.setColor(Color.WHITE);
-				Rect r = new Rect(50, 50, ScreenW-50, ScreenH-50);
+				Rect r = new Rect(0, 0, ScreenW, ScreenH);
 				//Rect r = new Rect(50, 50, 100, 100);
 				c.drawRect(r, p);
 				p.setColor(Color.BLUE);

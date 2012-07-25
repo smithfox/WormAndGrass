@@ -21,8 +21,8 @@ public class GameActivity extends Activity {
 
         gameview=(SurfaceView)this.findViewById(R.id.gameview);
 
-//        gameview.setLongClickable(true);
-//        gameview.setKeepScreenOn(true);// 保持屏幕常亮
+        gameview.setLongClickable(true);
+        gameview.setKeepScreenOn(true);// 保持屏幕常亮
 
         //gameview.getHolder().setFixedSize(300, 300);//设置分辨率
         gameview.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);//设置surfaceview不维护自己的缓冲区，而是等待屏幕的渲染引擎将内容推送到用户面前
