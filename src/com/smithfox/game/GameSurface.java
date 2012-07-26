@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Paint.Align;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -33,6 +34,8 @@ public class GameSurface implements SurfaceHolder.Callback, Runnable {
 		Log.d(TAG, "surfaceChanged, w="+width+",h="+height);
 		this.height = height;
 		this.width = width;
+		World.w = this.width;
+		World.h = this.height;
 //		if(stopped) {
 //			new Thread(this).start();
 //		}
@@ -75,18 +78,27 @@ public class GameSurface implements SurfaceHolder.Callback, Runnable {
 		last = millis;
 	}
 	
+	public void drawWorm(Worm m, Canvas c) {
+		this.paint.setColor(Color.RED);
+		Rect r = new Rect(m.state_x, m.state_y, m.state_x+4, m.state_y+4);
+		c.drawRect(r, this.paint);
+	}
+	
 	private void draw(long count) {
 		Canvas c = null;
 		try {
 			//Log.d(TAG, "draw");
 			c = holder.lockCanvas();
 			if(c!=null) {
-//				this.paint.setColor(Color.WHITE);
-//				Rect r = new Rect(0, 0, this.width, this.height);
-//				c.drawRect(r, this.paint);
+				this.paint.setColor(Color.WHITE);
+				Rect r = new Rect(0,0,this.width,this.height);
+				c.drawRect(r, this.paint);
+				for(Worm m : World.worms) {
+					drawWorm(m,c);
+				}
 
-				c.drawARGB(255, 0, 0, 0);
-				c.drawText("" + count/1000, this.width/2, this.height/2, this.paint);
+//				c.drawARGB(255, 0, 0, 0);
+//				c.drawText("" + count/1000, this.width/2, this.height/2, this.paint);
 			} else {
 				Log.d(TAG, "lockCanvas return null");
 			}
@@ -121,6 +133,7 @@ public class GameSurface implements SurfaceHolder.Callback, Runnable {
 		now = System.currentTimeMillis();
 		if (now > next) {
 			millis = last + now - start;
+			World.turn();
 			draw(millis);
 			next = now + MILLIS_PER_TICK;
 		} else {

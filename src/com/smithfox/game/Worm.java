@@ -1,5 +1,7 @@
 package com.smithfox.game;
 
+import android.util.Log;
+
 public class Worm implements Mote{
 	byte gen[];//最本质的基因, 可以遗传给下一代, 由World的遗传算法规则决定怎样变异, 怎样混合
 	
@@ -10,8 +12,8 @@ public class Worm implements Mote{
 	
 	int state_px,state_py;
 	
-	int state_step = 1;
-	int state_pstep = 1;
+	int state_step = 4;
+	int state_pstep = 4;
 	
 	public Worm(byte[] gen, int state_x, int state_y) {
 		this.gen = new byte[gen.length];
@@ -45,9 +47,9 @@ public class Worm implements Mote{
 	
 	//0--up, 1--right, 2--down, 3--left
 	//cost  1 clock, 1 engine
-	public void move(byte direction) {
-		state_engine -= 1;
-		if(state_engine<=0) return;
+	public void move(int direction) {
+		//state_engine -= 1;
+		//if(state_engine<=0) return;
 		
 		switch(direction) {
 		case 0:
@@ -75,6 +77,8 @@ public class Worm implements Mote{
 		} else if(state_y>World.h) {
 			state_y = state_y - World.h;
 		}
+		
+		//Log.d("worm", "direction="+direction+",x="+state_x+",y="+state_y);
 	}
 	
 	//0--up, 1--right, 2--down, 3--left
@@ -116,8 +120,9 @@ public class Worm implements Mote{
 	}
 	
 	public void eat() {
-		Mote m = World.here(this.state_x, this.state_y);
+		Mote m = World.whatIsHere(this.state_x, this.state_y);
 		if(m != null) {
+			this.state_engine += 10;
 			
 		}
 	}

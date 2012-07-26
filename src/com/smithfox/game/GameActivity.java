@@ -135,7 +135,7 @@ public class GameActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case 1:
-			Toast.makeText(this, "你点击了Button1", Toast.LENGTH_SHORT).show();
+			World.addRandomWorm();
 			break;
 		case 2:
 			Toast.makeText(this, "你点击了Button2", Toast.LENGTH_SHORT).show();
