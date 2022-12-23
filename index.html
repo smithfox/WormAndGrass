@@ -25,13 +25,52 @@
 </head>
 
 <body>
-    <canvas id="renderCanvas"></canvas>
+    <canvas id="renderCanvas" style="background-color: beige;">Browser does not support HTML5 canvas</canvas>
+
     <script type="text/javascript">
-        var canvas = document.getElementById('renderCanvas');
-        var ctx = canvas.getContext('2d');
-        ctx.fillRect(10, 10, 200, 100);
-        ctx.fillStyle = 'red';
-        ctx.fillText('Hello, Worm and Grass!', 30, 30);
+        const dpr = window.devicePixelRatio;
+        const canvas = document.getElementById('renderCanvas');
+
+        const CanvasWidth = 1440;
+        const CanvasHeight = 768;
+
+        const resizeCanvas = () => {
+            console.log("resizeCanvas");
+            var newCanvasWidth = CanvasWidth;
+            var newCanvasHeight = CanvasHeight;
+
+            const aspectCanvas = CanvasWidth / CanvasHeight;
+            const aspectWindow = window.innerWidth / window.innerHeight;
+
+            //保证比例不变
+            if (aspectWindow > aspectCanvas) { // window 偏宽
+                newCanvasHeight = window.innerHeight;
+                newCanvasWidth = Math.floor(newCanvasHeight * aspectCanvas);
+            } else { //window 偏高
+                newCanvasWidth = window.innerWidth;
+                newCanvasHeight = Math.floor(newCanvasWidth / aspectCanvas);
+            }
+
+            canvas.width = newCanvasWidth * dpr;
+            canvas.height = newCanvasHeight * dpr;
+            canvas.style.width = newCanvasWidth + 'px';
+            canvas.style.height = newCanvasHeight + 'px';
+        
+            drawExample();
+        }
+
+        const drawExample = () => {
+            console.log("drawExample");
+            var ctx = canvas.getContext('2d');
+            ctx.fillRect(0, 0, 1440, 900);
+            ctx.fillStyle = 'red';
+            ctx.font = '2em Arial';
+            ctx.fillText('Hello, Worm and Grass!', 700, 450);
+        }
+
+        resizeCanvas();
+
+        window.onresize = resizeCanvas;
     </script>
 </body>
 
