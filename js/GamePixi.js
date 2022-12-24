@@ -23316,17 +23316,6 @@ ${e}`);
       this._app.ticker.maxFPS = fps;
     }
   };
-
-  // ts/Program.ts
-  var Program2 = class {
-    static Main() {
-      let game = new GamePixi();
-      game.CreateScene("renderCanvas");
-    }
-  };
-  window.onload = () => {
-    Program2.Main();
-  };
 })();
 /*! https://mths.be/punycode v1.3.2 by @mathias */
 //!!!!

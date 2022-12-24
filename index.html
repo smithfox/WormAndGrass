@@ -6,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-    <title>Worm And Grass</title>
+    <title>虫子和草</title>
+
     <style>
-        * {padding: 0; margin: 0}
         html,
         body {
             overflow: hidden;
@@ -17,17 +17,96 @@
             margin: 0;
             padding: 0;
         }
+
         #renderCanvas {
             width: 100%;
             height: 100%;
             touch-action: none;
         }
+
+        #controlPanel {
+            font-size: 12px;
+            padding: 5px;
+            width: 200px;
+            height: auto;
+            background:rgba(255, 255, 255, 0.5);
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+        input {
+            font-size: 14px;
+            width: 40px;
+        }
+        .topWormInfo {
+            color:black;
+            width:120px;
+            text-align:left;
+            margin-bottom:3px;
+        }
+        .selected {
+            border: 2px solid #FFFF00;
+        }
+        .infoDiv {
+            padding: 0 4px;
+            margin-bottom: 5px; 
+            border: 1px solid #BBBBBB;
+            overflow: hidden;
+        }
+        .infoBar {
+            margin: 0 -4px;
+            color: #000000;
+            background-color: #BBBBBB;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
-    <canvas id="renderCanvas" style="background-color: beige;">Browser does not support HTML5 canvas</canvas>
-    <script src="js/pixi.js"></script>
+    <canvas id="renderCanvas"></canvas>
+    <div id="controlPanel">
+        <div style="margin-bottom: 5px;">
+            <label>虫</label>
+            <input id="wormText" type="number" value="10"></input>
+            <label>草</label>
+            <input id="grassText" type="number" value="10"></input>
+            <button id="createButton">新</button>
+        </div>
+        <div>
+            <label>FPS</label>
+            <input id="fpsText" type="number" value="10"></input>
+            <button id="toggleSuspendButton">开始</button>
+            <button id="stepDebugButton">单步</button>
+        </div>
+        <div class="infoDiv">
+            <div id="infoDiv0" class="infoContent">
+            </div>
+        </div>
+        <div class="infoDiv">
+            <div class="infoBar"><button class="infoDivToggleBtn">X</button><span>&nbsp;所选物属性</span></div>
+            <div id="infoDiv1" class="infoContent"></div>
+        </div>
+        <div class="infoDiv">
+            <div class="infoBar"><button class="infoDivToggleBtn">X</button><span>&nbsp;排行榜</span></div>
+            <div id="infoDiv2" class="infoContent"></div>
+        </div>
+        <div class="infoDiv">
+            <div class="infoBar"><button class="infoDivToggleBtn">X</button><span>&nbsp;世界规则</span></div>
+            <div id="infoDiv3" class="infoContent">
+            <div>
+            <label>&nbsp;虫吃草获得能量:&nbsp;</label><input id="EatEngergyInput" type="number" value="0" style="width: 80px;"/><br>
+            <label>&nbsp;虫移动消耗能量:&nbsp;</label><input id="WormMoveCostInput" type="number" value="0" style="width: 80px;"/><br>
+            <label>&nbsp;虫的初始总能量:&nbsp;</label><input id="WormEngergyInput" type="number" value="0" style="width: 80px;"/><br>
+            <label>&nbsp;草的初始总能量:&nbsp;</label><input id="GrassEngergyInput" type="number" value="0" style="width: 80px;"/>
+            </div>
+            <div style="text-align: right; padding-right: 10px;">
+                <button id="confirmButton">确认</button>
+            </div>
+            </div>
+        </div>
+    </div>
     <script src="js/Program.js"></script>
 </body>
 
